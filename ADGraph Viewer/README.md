@@ -18,24 +18,6 @@ python3 -m http.server 8000 --directory Optimized
 
 Then open `http://localhost:8000`.
 
-## Optimized core
-
-This edition uses a revisioned in-memory graph index shared by search, the
-Inspector, expansion, saved queries, custom queries, rendering, and candidate
-guidance. Incoming, outgoing, incident, membership, containment, node-kind,
-edge-kind, and high-value lookups are built once per ingestion revision.
-
-Overlapping collector files are merged and duplicate relationship variants are
-discarded during ingestion. Computed relationships such as paired-rights
-DCSync use the same derived-edge layer as filters, edge search, rendering, and
-path analysis.
-
-Saved attack-path queries now use the same relationship allow-list and cost
-model as Suggested attack paths, preventing structural hierarchy and incomplete
-single-prerequisite relationships from becoming attack steps. Filtering an
-existing view reuses the vis-network instance and preserves positions rather
-than running a new layout. File parsing runs in a Web Worker when permitted,
-with the original parser retained as a compatibility fallback.
 
 ## Structure
 
@@ -99,56 +81,5 @@ the mapping does, why it is useful, and which collection data it needs. Selectin
 a node or relationship replaces that explanation with the normal object or edge
 details.
 
-## Guided analysis
-
-After collection data loads, the **Suggested attack paths** section ranks up to
-six candidate routes toward Domain Admins, forest-level privileged groups, and
-other high-value targets. Objects marked Owned are always preferred as starting
-points. If none are marked, the tool uses clearly labelled low-privilege or
-credential-exposure assumptions. Controls can restrict target tiers, maximum
-hops, session evidence, inherited rights, cross-domain steps, and assumed
-starting points. Results can be ranked for feasibility, target privilege, or
-hop count. Each recommendation shows its tier, evidence quality, hop count, and
-transparent heuristic cost; clicking it renders only the supporting path.
-
-Selecting a node adds **Candidate path from selected object** to the Inspector.
-One primary path is shown and up to two lower-ranked alternatives remain in a
-collapsed section. Every option begins at the selected object and ends at a
-collected high-value target. The evidence button renders that path without
-mixing in suggestions for other objects. Selecting a node or edge keeps the
-existing detailed findings and validation-command behavior.
-
-Candidate paths use weighted, loopless search rather than accepting the first
-fewest-hop route found. Direct control relationships receive lower costs, while
-session evidence, inherited permissions, and referenced-only objects receive
-penalties. These values are comparative heuristics—not exploitation
-probabilities—and each edge still needs validation against the lab environment.
-When the same principal has both `GetChanges` and `GetChangesAll` over one
-domain, the guidance engine represents them as a computed DCSync step and shows
-that derivation as a validation caveat; neither permission is accepted alone.
-
-Graph history also stores the logical Inspector selection. Using **Back**
-restores the node, relationship, saved-query explanation, or candidate-path
-explanation that belonged to the restored graph view instead of retaining stale
-information from the newer view.
-
-Selecting a relationship shows labelled Source and Destination endpoints plus
-a plain-language interpretation of the edge. Counterintuitive BloodHound
-directions—such as Computer → User for HasSession—also explain the underlying
-privilege-flow meaning and distinguish collected evidence from guaranteed
-access.
-
-Recommendations are leads, not proof of exploitability. Session data may be
-stale, inherited permissions should be confirmed, referenced-only objects may
-be incomplete, and absent collection methods can hide relationships. The tool
-does not execute any attack action.
-
-## Test
-
-From the repository root:
-
-```bash
-node 2.0/tests/smoke.js
-```
 
 No dependencies need to be installed.
