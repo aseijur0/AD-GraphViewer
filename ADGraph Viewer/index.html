@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AD//GRAPH Optimized — Netrunner Workspace</title>
+
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<header id="topbar">
+  <div class="brand">AD//GRAPH <span style="color:var(--accent);font-size:11px">OPTIMIZED · NETRUNNER</span></div>
+  <div id="summaryLine" class="summaryLine">No data loaded yet.</div>
+  <div class="topActions">
+    <label class="fileBtn">Add files<input type="file" id="fileInput" multiple accept=".json,.zip" hidden></label>
+    <button id="sampleBtn" class="ghostBtn" type="button">Load sample data</button>
+    <button id="inspectorMobileBtn" class="ghostBtn mobilePanelBtn" type="button" style="display:none">Inspector</button>
+    <button id="exportBtn" class="ghostBtn" type="button">Export view</button>
+    <button id="clearBtn" class="ghostBtn" type="button">Clear</button>
+    <button id="themeToggle" class="ghostBtn iconBtn" type="button" aria-label="Switch to light mode" title="Switch to light mode">&#9788;</button>
+  </div>
+</header>
+<div id="dropHint">Drop SharpHound / AzureHound .json or .zip files anywhere on this page</div>
+<div class="layout" id="layout">
+  <aside id="queryPanel">
+    <div class="queryPanelHead">
+      <div class="sideHeading">Explore</div>
+    </div>
+    <div id="queryBody" class="queryBody">
+      <details class="exploreSection" id="suggestedPathsSection" hidden>
+        <summary>Suggested attack paths <span id="suggestedPathCount" class="summaryCount"></span></summary><div class="exploreContent">
+        <div id="suggestedPathStatus" class="suggestedPathStatus">Candidate paths will appear after data is loaded.</div>
+        <div class="pathTuningGrid">
+          <label><span>Targets</span><select id="pathTargetMode" class="querySelect"><option value="all">All target tiers</option><option value="privilege">Forest/domain privilege only</option><option value="highvalue">Any high-value object</option></select></label>
+          <label><span>Optimize</span><select id="pathOptimizeMode" class="querySelect"><option value="highest">Highest privilege</option><option value="feasible">Most feasible</option><option value="hops">Fewest hops</option></select></label>
+          <label><span>Maximum hops</span><input id="pathMaxHops" class="edgeQueryInput" type="number" min="1" max="20" value="12"></label>
+        </div>
+        <div class="pathOptionList">
+          <label><input id="pathAllowSessions" type="checkbox" checked> Allow session evidence</label>
+          <label><input id="pathAllowInherited" type="checkbox" checked> Allow inherited rights</label>
+          <label><input id="pathAllowCrossDomain" type="checkbox" checked> Allow cross-domain steps</label>
+          <label><input id="pathOwnedOnly" type="checkbox"> Start only from Owned objects</label>
+        </div>
+        <div id="suggestedPathList" class="suggestedPathList"></div>
+        <div class="miniActions"><button id="refreshSuggestedPathsBtn" class="miniBtn" type="button">Refresh suggestions</button></div>
+        </div>
+      </details>
+      <details class="exploreSection">
+        <summary>Find objects</summary><div class="exploreContent">
+        <label class="queryField">
+          <input type="text" id="searchInput" class="searchInput" placeholder="Name or SID…" autocomplete="off">
+        </label>
+        <div id="searchResults" class="searchResults" style="display:none"></div>
+        </div>
+      </details>
+      <details class="exploreSection">
+        <summary>Saved query</summary><div class="exploreContent">
+        <label class="queryField">
+          <select id="queryList" class="querySelect" aria-label="Run a common query"></select>
+        </label>
+        </div>
+      </details>
+      <details class="exploreSection">
+        <summary>Custom query</summary><div class="exploreContent">
+        <label class="queryField">
+          <span class="queryLabel">Cypher-like query</span>
+          <textarea id="customQueryInput" class="customQueryInput" spellcheck="false" placeholder="MATCH (u:User)-[r:MemberOf]->(g:Group)&#10;WHERE g.name CONTAINS &quot;DOMAIN ADMINS&quot;&#10;RETURN u, r, g LIMIT 100"></textarea>
+        </label>
+        <div class="miniActions"><button id="runCustomQueryBtn" class="miniBtn" type="button">Run query</button><button id="clearCustomQueryBtn" class="miniBtn" type="button">Clear</button></div>
+        <div id="customQueryStatus" class="edgeQueryStatus" aria-live="polite"></div>
+        <details class="queryHelp"><summary>Syntax and examples</summary>
+          <div><code>MATCH (n:Computer) WHERE n.enabled = true RETURN n LIMIT 100</code></div>
+          <div><code>MATCH (u:User {dontreqpreauth: true}) RETURN u</code></div>
+          <div><code>MATCH p=(u:User)-[r:MemberOf*1..]-&gt;(g:Group {highvalue:true}) RETURN p</code></div>
+          <div>Properties can be inline or in <code>WHERE</code>. Named paths, chained patterns, <code>shortestPath(...)</code>, <code>*1..</code>, bounded ranges such as <code>*1..5</code>, and relationship unions such as <code>MemberOf|AdminTo</code> are supported. Unbounded paths are safely capped at 12 hops. Neo4j projections such as <code>DISTINCT</code>, <code>collect(...)</code>, aliases, and <code>ORDER BY</code> are accepted, but this viewer displays their matched subgraph rather than a result table.</div>
+        </details>
+        </div>
+      </details>
+      <details class="exploreSection">
+        <summary>Edge query</summary><div class="exploreContent">
+        <label class="queryField">
+          <input id="edgeQueryInput" class="edgeQueryInput" type="search" list="edgeKindOptions" placeholder="e.g. CanPSRemote" autocomplete="off">
+          <datalist id="edgeKindOptions"></datalist>
+        </label>
+        <div class="expandGrid">
+          <select id="edgeMatchMode" class="querySelect" aria-label="Edge match mode"><option value="partial">Partial match</option><option value="exact">Exact match</option></select>
+          <select id="edgeInheritance" class="querySelect" aria-label="Edge inheritance"><option value="any">Any origin</option><option value="direct">Direct only</option><option value="inherited">Inherited only</option></select>
+          <select id="edgeSourceKind" class="querySelect" aria-label="Source node type"><option value="">Any source</option></select>
+          <select id="edgeTargetKind" class="querySelect" aria-label="Target node type"><option value="">Any target</option></select>
+        </div>
+        <div class="miniActions"><button id="runEdgeQueryBtn" class="miniBtn" type="button">Run query</button><button id="clearEdgeQueryBtn" class="miniBtn" type="button">Clear</button></div>
+        <div id="edgeQueryStatus" class="edgeQueryStatus" aria-live="polite"></div>
+        </div>
+      </details>
+      <details class="exploreSection">
+        <summary>Filters</summary><div class="exploreContent">
+        <label id="ownedFilterRow" class="filterRow" style="display:none"><input id="ownedOnlyFilter" type="checkbox"><span class="tag tagOwned">Owned</span><span>Owned nodes only</span><span id="ownedCount" class="fkCount">0</span></label>
+        <div class="filterSubhead">Nodes</div>
+        <div id="filterList"><div class="placeholder">Load data to see object types.</div></div>
+        <div class="filterSubhead">Edge categories</div>
+        <div id="relationshipFilters" class="catLegend">
+          <label class="filterRow"><input type="checkbox" data-category="structural" checked><span class="dot" style="background:#4A5262"></span>Structural</label>
+          <label class="filterRow"><input type="checkbox" data-category="access" checked><span class="dot" style="background:#4FA3F7"></span>Access</label>
+          <label class="filterRow"><input type="checkbox" data-category="acl" checked><span class="dot" style="background:#E8895D"></span>ACL rights</label>
+          <label class="filterRow"><input type="checkbox" data-category="adcs" checked><span class="dot" style="background:#B784E8"></span>AD CS</label>
+        </div>
+        <div class="filterSubhead">Edge types</div>
+        <input id="edgeTypeFilterSearch" class="searchInput" type="search" placeholder="Filter edge types…" aria-label="Filter edge type list">
+        <div id="edgeTypeFilterList"><div class="placeholder">Load data to see edge types.</div></div>
+        <div id="appliedFilters" class="appliedFilters"></div>
+        <div class="miniActions"><button id="selectAllFiltersBtn" class="miniBtn" type="button">Select all</button><button id="clearFiltersBtn" class="miniBtn" type="button">Clear all</button><button id="resetFiltersBtn" class="miniBtn" type="button">Reset</button></div>
+        </div>
+      </details>
+    </div>
+  </aside>
+  <button id="queryToggle" class="queryToggle" type="button" aria-expanded="true" aria-controls="queryPanel" aria-label="Close Explore sidebar" title="Close Explore sidebar">&#8249;</button>
+  <main id="graphArea">
+    <div class="graphToolbar" aria-label="Graph controls">
+      <div id="edgeDirectionControl" class="directionControl" role="group" aria-label="Filter relationships by direction">
+        <span id="edgeDirectionLabel" class="directionControlLabel">Edges</span>
+        <button class="directionBtn" type="button" data-edge-direction="all" aria-pressed="true" title="Show all relationships in this view">All</button>
+        <button class="directionBtn" type="button" data-edge-direction="in" aria-pressed="false" title="Select an object to show its incoming relationships" disabled>In</button>
+        <button class="directionBtn" type="button" data-edge-direction="out" aria-pressed="false" title="Select an object to show its outgoing relationships" disabled>Out</button>
+      </div>
+      <button id="backViewBtn" class="toolBtn" type="button" title="Return to the previous graph view" disabled>Back</button>
+      <button id="fitBtn" class="toolBtn" type="button" title="Fit the entire graph in view">Fit</button>
+      <button id="zoomInBtn" class="toolBtn" type="button" aria-label="Zoom in" title="Zoom in">+</button>
+      <button id="zoomOutBtn" class="toolBtn" type="button" aria-label="Zoom out" title="Zoom out">−</button>
+      <button id="layoutBtn" class="toolBtn" type="button" title="Re-run the force-directed layout">Layout</button>
+      <button id="freezeBtn" class="toolBtn" type="button" title="Resume graph physics">Unfreeze</button>
+      <button id="isolateBtn" class="toolBtn" type="button" title="Show only the selected nodes">Isolate</button>
+      <button id="pathBtn" class="toolBtn" type="button" title="Find the shortest path between two selected nodes">Path</button>
+      <button id="hideSelectedBtn" class="toolBtn" type="button" title="Remove selected nodes from this view">Hide</button>
+      <button id="groupEdgesBtn" class="toolBtn" type="button" title="Combine matching parallel edges">Group edges</button>
+      <button id="clearSceneBtn" class="toolBtn" type="button" title="Clear the current graph without removing loaded data">Clear scene</button>
+      <button id="fullscreenBtn" class="toolBtn" type="button" title="Toggle fullscreen graph view">Fullscreen</button>
+    </div>
+    <div id="emptyState" class="stateMsg">
+      <p>Drop BloodHound-format JSON files, or a SharpHound / AzureHound .zip, anywhere on this page.</p>
+      <button id="sampleBtn2" class="ghostBtn" type="button">Load sample data instead</button>
+    </div>
+    <div id="readyState" class="stateMsg" style="display:none">
+      <p id="readyText"></p>
+      <button id="showFullBtn" class="ghostBtn" type="button">Show entire graph</button>
+    </div>
+    <div id="canvasCaption" class="canvasCaption" style="display:none"></div>
+    <div id="canvas" style="display:none"></div>
+    <div id="workspaceStatus" class="workspaceStatus" style="display:none"></div>
+    <div id="graphLegend" class="graphLegend" style="display:none" aria-label="Graph legend">
+      <span><span class="dot" style="background:#4A5262"></span>Structural</span>
+      <span><span class="dot" style="background:#4FA3F7"></span>Access</span>
+      <span><span class="dot" style="background:#E8895D"></span>ACL rights</span>
+      <span><span class="dot" style="background:#B784E8"></span>AD CS</span>
+      <span><span class="lineSwatch"></span>Direct</span>
+      <span><span class="lineSwatch lineSwatchDashed"></span>Inherited</span>
+      <span><span class="dot" style="background:#5A6072;border:2px dashed #9AA3B5;width:14px;height:14px"></span>Referenced only</span>
+    </div>
+    <div id="expandPanel">
+      <div class="sideHeading">Selective expansion</div>
+      <div id="expandNodeName" style="font-size:13px"></div>
+      <div class="expandGrid"><select id="expandDirection" class="querySelect"><option value="both">Both directions</option><option value="out">Outgoing</option><option value="in">Incoming</option></select><input id="expandLimit" class="edgeQueryInput" type="number" min="1" max="250" value="50" aria-label="Maximum neighbors"></div>
+      <div id="expandKinds" class="expandKinds"></div>
+      <div class="miniActions"><button id="runExpandBtn" class="miniBtn" type="button">Expand</button><button id="cancelExpandBtn" class="miniBtn" type="button">Cancel</button></div>
+    </div>
+  </main>
+  <aside id="sidebar" class="noData">
+    <div class="sideSection"><div style="display:flex;align-items:center"><div class="sideHeading" style="flex:1">Inspector</div><button id="closeInspectorBtn" class="miniBtn mobilePanelBtn" type="button">Close</button></div><div id="inspector"><div class="placeholder">Select an object or relationship.</div></div></div>
+    <div class="sideSection sideSectionGrow"><div class="sideHeading">Security finding</div><div id="findingPanel"></div></div>
+  </aside>
+</div>
+<div id="toast" role="status" aria-live="polite" style="position:fixed;left:50%;bottom:22px;z-index:100;transform:translate(-50%,16px);opacity:0;pointer-events:none;background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);transition:opacity .15s,transform .15s"></div>
+<script src="js/vendor/vis-network.min.js"></script>
+<script src="js/vendor/jszip.min.js"></script>
+<script src="js/bloodhound-parser.js"></script>
+<script src="js/graph-store.js"></script>
+<script src="js/sample-data.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/graph-index.js"></script>
+<script src="js/file-ingestion.js"></script>
+<script src="js/filter-engine.js"></script>
+<script src="js/query-engine.js"></script>
+<script src="js/guidance-engine.js"></script>
+<script src="js/graph-renderer.js"></script>
+<script src="js/findings.js"></script>
+<script src="js/inspector.js"></script>
+<script src="js/workspace.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
