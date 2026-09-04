@@ -46,40 +46,5 @@ The files intentionally use classic scripts rather than ES modules. This keeps
 the application directly openable through `file://` while allowing the existing
 shared graph state to remain available across files.
 
-## Saved query catalogue
-
-The Saved Query menu is grouped by workflow and includes 47 mappings:
-
-- **Attack paths:** shortest paths to Domain Admins/high-value targets, paths
-  from owned objects and broad low-privilege groups, paths to other privileged
-  groups, a heuristic lowest-cost path view, and attack-path choke points.
-- **Credentials:** Kerberoastable and AS-REP roastable users, old active-user
-  passwords, and principals able to read LAPS or gMSA passwords.
-- **Object control:** DCSync, dangerous direct rights, and dangerous rights
-  assigned to broad groups such as Domain Users or Authenticated Users.
-- **Sessions and lateral movement:** remote administration edges, computer-to-
-  computer administration, privileged sessions, and privileged sessions on
-  non-domain-controller systems.
-- **Delegation:** unconstrained delegation, constrained delegation, RBCD, and
-  privileged sessions exposed on unconstrained-delegation hosts.
-- **Identity hygiene:** privileged/high-value inventory, privileged users not
-  in Protected Users, inactive enabled privileged accounts, SID history, and
-  unsupported active Windows hosts that have incoming access paths.
-- **Policy and hierarchy:** writable GPO impact, writable OU/container impact,
-  deep group nesting, and circular group nesting.
-- **Domains and trusts:** trust maps, same-forest trusts, cross-domain group
-  membership, and ACLs that cross domain boundaries.
-- **AD CS:** PKI inventory, computed ESC paths, ESC1/3/4, CA control, and
-  certificate-services relay paths.
-
-Mappings depend on the corresponding SharpHound collection methods and fields.
-A query with no matching collected evidence reports no results; it does not
-infer missing relationships.
-
-Selecting a saved query also shows a short explanation in the Inspector: what
-the mapping does, why it is useful, and which collection data it needs. Selecting
-a node or relationship replaces that explanation with the normal object or edge
-details.
-
 
 No dependencies need to be installed.
