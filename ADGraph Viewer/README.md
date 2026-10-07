@@ -10,7 +10,13 @@ No dependencies need to be installed.
 Open `index.html` directly in a modern browser. The application uses classic,
 ordered browser scripts, so a local web server and build step are not required.
 
+## Changes To Be Done
 
+Currently, the tool just support files less than 256MB.
+Another version is in progress, it'll be added under a new name depending on the requirement.
 
+## Credits
 
-
+Luke Arndt - MDSec ( for initial ideation and testing ) 
+King Remy - MDSec ( for UI design and application flow )
+Codex - For looking at issues and resolution.
