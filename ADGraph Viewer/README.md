@@ -5,6 +5,14 @@ AzureHound JSON/ZIP collections. All collection data remains in memory in the
 current browser tab.
 No dependencies need to be installed.
 
+## Why
+Let me preface this by saying, BloodHound is an amazing tool and I'm not trying to "create" a replacement.  
+
+BloodHound installation and troubleshooting was a bit bothersome for me, especially when I was practicing on labs for my OSCP exam. 
+After talking to my colleagues, I realized that they faced similar problems and that's what led to this tool being developed.
+I wanted a lightweight BloodHound like tool that could run anywhere.
+
+
 ## Run
 
 Open `index.html` directly in a modern browser. The application uses classic,
