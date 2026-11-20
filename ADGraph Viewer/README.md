@@ -17,6 +17,7 @@ Another version is in progress, it'll be added under a new name depending on the
 
 ## Credits
 
-Luke Arndt - MDSec ( for initial ideation and testing ) 
-King Remy - MDSec ( for UI design and application flow )
-Codex - For looking at issues and resolution.
+- Luke Arndt ( for initial ideation and testing ) 
+- King Remy ( for UI design and application flow )
+- David Sunley ( for continuous testing and feedback ) 
+- Codex, Claude - Coding
