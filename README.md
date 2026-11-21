@@ -21,7 +21,9 @@ ordered browser scripts, so a local web server and build step are not required.
 ## Changes To Be Done
 
 Currently, the tool just support files less than 512MB.
+The tool is still in development so feedbacks of any manner are greatly appreciated. 
 Another version is in progress, it'll be added under a new name depending on the requirement.
+
 
 ## Credits
 
