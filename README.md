@@ -1,6 +1,6 @@
-# ADGraph Viewer
+# AD-GraphViewer
 
-ADGraph Viewer is a database-free, browser-only viewer for SharpHound and
+AD-GraphViewer is a database-free, browser-only viewer for SharpHound and
 AzureHound JSON/ZIP collections. All collection data remains in memory in the
 current browser tab.
 No dependencies need to be installed.
