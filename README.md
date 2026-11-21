@@ -15,7 +15,7 @@ I wanted a lightweight BloodHound like tool that could run anywhere.
 
 ## Run
 
-Open `index.html` directly in a modern browser. The application uses classic,
+Open `index.html` directly in a browser. The application uses classic,
 ordered browser scripts, so a local web server and build step are not required.
 
 ## Changes To Be Done
